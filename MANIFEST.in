@@ -1,0 +1,4 @@
+include CHANGELOG.md
+include bin/council
+recursive-include skills *.md
+recursive-include tests *.py

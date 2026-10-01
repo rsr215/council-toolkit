@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-council-toolkit"
+version = "0.4.0"
+description = "Configurable multi-model workflows with durable owner decisions"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+council = "council.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["council*"]
+
+[tool.setuptools.package-data]
+council = ["workflows/*.toml", "roster.toml"]

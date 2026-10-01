@@ -1,0 +1,24 @@
+version = 1
+entry = "review"
+max_steps = 4
+
+[phases.review]
+kind = "agent"
+role = "reviewer"
+read_only = true
+instructions = "Independently review the supplied workspace against the owner's objective and project rules. This may be source code, an architecture plan, or another existing artifact; no implementer output is required. Do not edit files. Give ranked findings with specific file/line evidence, distinguish facts from inference, and state what you could not verify. Return clear only if you found no actionable issue."
+[phases.review.routes]
+findings = "synthesize"
+clear = "synthesize"
+
+[phases.synthesize]
+kind = "agent"
+role = "coordinator"
+read_only = true
+include_project_context = true
+inputs = ["review"]
+fresh_on_complete = ["review"]
+required_on_complete = {review = ["clear", "findings"]}
+instructions = "Summarize the independent review for the owner, preserving each finding and its evidence. State whether checks ran and what remains unverified. You may suggest next actions, but do not implement, dismiss an unsupported finding, or treat this review as permission to merge or publish."
+[phases.synthesize.routes]
+ready = "@done"

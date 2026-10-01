@@ -1,0 +1,30 @@
+version = 1
+entry = "research"
+max_steps = 6
+
+[phases.research]
+kind = "agent"
+role = "researcher"
+read_only = true
+instructions = "Use the supplied project material to produce an evidence-backed research brief. Separate facts, assumptions, and unanswered questions. Cite sources present in the material; do not invent external research or imply browsing occurred. Ask the owner if missing material prevents a useful answer."
+[phases.research.routes]
+ready = "critique"
+
+[phases.critique]
+kind = "agent"
+role = "reviewer"
+read_only = true
+inputs = ["research"]
+instructions = "Critique the research brief: factual gaps, unjustified certainty, alternatives, and decision consequences. Be specific and evidence-based."
+[phases.critique.routes]
+ready = "synthesize"
+
+[phases.synthesize]
+kind = "agent"
+role = "coordinator"
+include_project_context = true
+read_only = true
+inputs = ["research", "critique"]
+instructions = "Produce the final brief and a disposition of each criticism. Distinguish recommendations from owner decisions. Request owner input only if a choice is needed to complete the work; otherwise produce the brief without another owner checkpoint."
+[phases.synthesize.routes]
+ready = "@done"

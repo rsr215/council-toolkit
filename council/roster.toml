@@ -1,0 +1,45 @@
+# Council model roster. Project rules live in the local project registry.
+# Assign a role to any configured executor/model without editing Python.
+# Keep the reviewer on a separate model family for independent judgment.
+
+# Reusable workflow assignments. Change models here, never in Python.
+# These use separately installed, authenticated CLIs. No provider fallback.
+[executors.claude]
+kind = "claude-cli"
+binary = "claude"
+
+[executors.codex]
+kind = "codex-cli"
+binary = "codex"
+
+# Optional work setup: assign roles to this executor after Copilot CLI sign-in.
+[executors.copilot]
+kind = "copilot-cli"
+binary = "copilot"
+
+[workflow_roles.coordinator]
+executor = "claude"
+model = "claude-opus-5-5"
+effort = "high"
+# Chat turns resume one Claude session per project thread; the ledger stays authoritative.
+# "ledger" sends the ledger context to a fresh session every turn and keeps no provider transcript.
+chat_session = "native"
+
+[workflow_roles.implementer]
+executor = "claude"
+model = "claude-opus-5-5"
+effort = "high"
+
+[workflow_roles.reviewer]
+executor = "codex"
+model = "gpt-6-sol"
+effort = "high"
+
+[executors.gemini]
+kind = "antigravity-cli"
+binary = "agy"
+
+[workflow_roles.researcher]
+executor = "gemini"
+model = "gemini-3.1-pro-high"
+effort = "high"

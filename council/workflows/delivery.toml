@@ -1,0 +1,51 @@
+version = 1
+entry = "plan"
+max_steps = 14
+
+[phases.plan]
+kind = "agent"
+role = "coordinator"
+include_project_context = true
+read_only = true
+instructions = "Prepare a bounded implementation packet: approved requirements, scope, acceptance, verification, and owner-only decisions. Choose ready only when implementation can proceed within the existing architecture. Return needs_owner with options and a recommendation if a decision is needed."
+[phases.plan.routes]
+ready = "implement"
+
+[phases.implement]
+kind = "agent"
+role = "implementer"
+read_only = false
+max_visits = 3
+inputs = ["plan", "disposition"]
+instructions = "Implement the approved packet or the disposition's narrow repairs. Preserve unrelated work. Do not change product or architecture decisions. Report changed files, limitations, and checks actually run. Keep the summary under 200 words."
+[phases.implement.routes]
+ready = "verify"
+
+[phases.verify]
+kind = "check"
+[phases.verify.routes]
+pass = "review"
+fail = "disposition"
+
+[phases.review]
+kind = "agent"
+role = "reviewer"
+read_only = true
+inputs = ["verify"]
+instructions = "Independently review the workspace against the task and project requirements. You receive no coordinator deliberations. Report ranked actionable findings with evidence and locations. Distinguish observed facts from inference; do not patch. Return findings or clear."
+[phases.review.routes]
+findings = "disposition"
+clear = "disposition"
+
+[phases.disposition]
+kind = "agent"
+role = "coordinator"
+include_project_context = true
+read_only = true
+inputs = ["plan", "implement", "verify", "review"]
+fresh_on_complete = ["verify", "review"]
+required_on_complete = {verify = ["pass"], review = ["clear", "findings"]}
+instructions = "Disposition every current finding using evidence. Accept, modify, defer with trigger, or reject with evidence. If checks failed, choose repair or needs_owner, never ready. Choose repair for a bounded correction, ready for a verified deliverable with no unresolved blocking findings, or needs_owner for architecture changes, scope expansion, or unresolved tradeoffs. Summary: outcome, evidence, autonomous decisions, unresolved limitations, next action."
+[phases.disposition.routes]
+repair = "implement"
+ready = "@done"

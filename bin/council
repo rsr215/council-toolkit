@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+"""Source-checkout entry point; no package installation needed."""
+from pathlib import Path
+import os
+import shutil
+import subprocess
+import sys
+
+if sys.version_info < (3, 11):
+    for name in ("python3.13", "python3.12", "python3.11"):
+        candidate = shutil.which(name)
+        if candidate and subprocess.run([candidate, "-c", "import sys; sys.exit(sys.version_info < (3, 11))"], capture_output=True).returncode == 0:
+            os.execv(candidate, [candidate, str(Path(__file__).resolve()), *sys.argv[1:]])
+    raise SystemExit("Council requires Python 3.11 or newer. Install it, then run council again.")
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from council.__main__ import main
+
+raise SystemExit(main())
